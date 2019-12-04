@@ -1,0 +1,17 @@
+check_reg_exp = "(Россия|Russia|Российская Федерация|Russian Federation)"
+chat_id = "-1"
+
+[keys]
+giphy = "abc"
+telegram = "bcd"
+
+[yes]
+giphy_query = "yes"
+parts = [["Да"]]
+
+[no]
+giphy_query = "no"
+parts = [
+    ["Сегодня", "Сейчас", "В данный момент"],
+    ["нет", "пока нет", "не вышел"]
+]
