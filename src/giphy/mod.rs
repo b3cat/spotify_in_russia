@@ -3,7 +3,7 @@ extern crate serde;
 
 use serde::{Serialize, Deserialize};
 
-const API_BASE: &'static str = "https://api.giphy.com/";
+const API_BASE: &str = "https://api.giphy.com/";
 
 #[derive(Serialize, Deserialize)]
 pub struct RandomImageRequest {

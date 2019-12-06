@@ -3,7 +3,7 @@ extern crate serde;
 
 use serde::{Serialize};
 
-const API_BASE: &'static str = "https://api.telegram.org/";
+const API_BASE: &str = "https://api.telegram.org/";
 
 pub struct Tgm<'a, 'b, 'c> {
     token: &'a str,

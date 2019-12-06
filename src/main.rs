@@ -10,7 +10,7 @@ use log::{info, warn, Level};
 use spotify_in_russia::{Checker, Config, Giphy, Tgm};
 
 // TODO: вынести в конфиг
-const DEFAULT_GIF_URL: &'static str = "https://media3.giphy.com/media/RddAJiGxTPQFa/giphy.gif";
+const DEFAULT_GIF_URL: &str = "https://media3.giphy.com/media/RddAJiGxTPQFa/giphy.gif";
 
 fn check_and_send(checker: &Checker, giphy: &Giphy, tgm: &Tgm, cfg: &Config, send_cond: &str) -> Option<()> {
     let is_available = match checker.check() {

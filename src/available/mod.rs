@@ -3,7 +3,7 @@ extern crate regex;
 
 use regex::Regex;
 
-const SPOTIFY_COUNTRY_URL: &'static str = "https://www.spotify.com/ru-ru/select-your-country/";
+const SPOTIFY_COUNTRY_URL: &str = "https://www.spotify.com/ru-ru/select-your-country/";
 
 #[derive(Debug)]
 pub enum CheckError {
@@ -40,6 +40,6 @@ impl Checker<'_> {
         let res = &self.client.get(SPOTIFY_COUNTRY_URL).send()?.text()?;
         let m = self.check_reg_exp.find(&res);
 
-        Ok(if let Some(_) = m { true } else { false })
+        Ok(if m.is_some() { true } else { false })
     }
 }
