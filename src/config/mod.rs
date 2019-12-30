@@ -33,16 +33,8 @@ impl Answer {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ApiKeys {
-    pub giphy: String,
-    pub telegram: String
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub check_reg_exp: String,
-    pub chat_id: String,
-    pub keys: ApiKeys,
     pub yes: Answer,
     pub no: Answer,
 }
