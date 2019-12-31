@@ -5,7 +5,7 @@ extern crate log;
 extern crate simple_logger;
 
 use clap::{App, Arg};
-use log::{info, warn, Level};
+use log::{info, error, Level};
 
 use spotify_in_russia::{Config, SpotifyInRussia, SpotifyEnvParams};
 
@@ -40,7 +40,9 @@ fn main() {
     let spoty = SpotifyInRussia::new(&http_client, &cfg, &env_params);
 
     info!("I'll try to send smth");
-    spoty.check_and_send(&notify).unwrap_or((|| {
-        warn!("Sending has been failed");
-    })())
+
+    match spoty.check_and_send(&notify) {
+        Some(_) => info!("Message has been sent"),
+        _ => error!("Sending has been failed"),
+    }
 }
