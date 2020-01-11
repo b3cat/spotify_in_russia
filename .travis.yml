@@ -9,7 +9,8 @@ matrix:
         - PACKAGE=${PROJECT_NAME}_linux_x86_64
 script:
   - cargo build --target $TARGET --verbose --release
-  - zip ${PACKAGE}.zip config.toml target/$TARGET/release/$PROJECT_NAME
+  - mv target/$TARGET/release/$PROJECT_NAME ./
+  - zip ${PACKAGE}.zip config.toml $PROJECT_NAME
 deploy:
   provider: releases
   skip_cleanup: true
