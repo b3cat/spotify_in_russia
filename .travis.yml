@@ -9,6 +9,8 @@ matrix:
         - PACKAGE=${PROJECT_NAME}_linux_x86_64
 script:
   - cargo build --target $TARGET --verbose --release
+  - mv target/$TARGET/release/$PROJECT_NAME ./
+  - zip ${PACKAGE}.zip config.toml $PROJECT_NAME
 deploy:
   provider: releases
   skip_cleanup: true
@@ -16,4 +18,4 @@ deploy:
     secure: "SYOmDDOMZUEtttLgpSeRG5Ot2fwTJhVFeHMgD35D57/b3iAn4gBnIYr8wwYyPdVezMAhSwMfDPrSdbc9gqRTAyJlCn4ADY+w41evgXMte8hymsR0j1ZfVCaM2Woo/XWzR/vhGxqShVNDV9IlXoWStmb4xgYNHfbdEeSpciyoASwiE0Um7SlUKplR2xUTu/WAu81uUCvcqrYZ1YJmawoDABNeb940GeDjnTLkYvtipL2DRYuA3dvwzPsAOnRqu2dlnxrjpB43kqsXMg0hxb1IshfEh3aWUbvuSIxsfbh0KVffAeJd15btVuepKWhPJtCRk8NPzBoZJWXpK09wbHiDqbRTD1ViVv69ksJKX6WB8FPPVI/vfP/w4FgY8uWNBO23WjdeRdfAIfgefF4vFwLSMIE/djifWT5lgAdUBYgM+EO7GGfZFFnFc5bYpDXLZ/bfDHOt/435+Vcp4xkVCoqoSm8LUybHn19Qsu5EoHx73/e96xGdbb9M4Sad2H8aFnTk3sCUeHl+oeea8jaHMm/XK2rJLUv2FnVsQOCzY9S/7HF3rHMJSmTCth4QAEED3wjEWJnA6AmPF5Q5YUL53Vzj5ZA1EmYu3eePfEmMjeRvCVTEz06b9EIeuYsH8a/zZVL/BMHNQwX7SiHFyvRNZRxYKudedYWnX0gukPx8dFSSzAE="
   on:
     tags: true
-  file: target/$TARGET/release/$PROJECT_NAME
+  file: ${PACKAGE}.zip
