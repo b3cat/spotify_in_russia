@@ -1,5 +1,10 @@
 check_reg_exp = "(Россия|Russia|Российская Федерация|Russian Federation)"
 
+[scheduler]
+spy_check_interval = 300 # 5 minutes in secs
+east_offfset = 18000 # 5 hours in secs
+daily_check_time = "22:00"
+
 [yes]
 giphy_query = "yes"
 parts = [
