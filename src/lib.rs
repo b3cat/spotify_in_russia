@@ -66,8 +66,7 @@ impl SpotifyInRussia<'_> {
         let message = format!("{}.\n\n{}", last_news, answer.get_pretty_answer());
         let giphy_query = &answer.giphy_query;
         
-        info!("Answer is:");
-        print!("{}", message);
+        info!("Answer is {}", message);
 
         info!("Giphy query is {}", giphy_query);
     
