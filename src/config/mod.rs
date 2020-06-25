@@ -33,14 +33,22 @@ impl Answer {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct SchedulerOpts {
+    pub spy_check_interval: u32,
+    pub daily_check_time: String,
+    pub east_offfset: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub check_reg_exp: String,
     pub yes: Answer,
     pub no: Answer,
+    pub scheduler: SchedulerOpts,
 }
 
 impl Config {
-    pub fn new(path: &str) -> Config {
+    pub fn from_path(path: &str) -> Config {
         let mut file = File::open(path).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();

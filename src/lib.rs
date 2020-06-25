@@ -8,7 +8,7 @@ mod mdz;
 
 use std::env;
 use log::{info, warn};
-pub use config::Config;
+pub use config::{Config, SchedulerOpts};
 
 const DEFAULT_GIF_URL: &str = "https://media3.giphy.com/media/RddAJiGxTPQFa/giphy.gif";
 
@@ -65,8 +65,10 @@ impl SpotifyInRussia<'_> {
 
         let message = format!("{}.\n\n{}", last_news, answer.get_pretty_answer());
         let giphy_query = &answer.giphy_query;
-    
-        info!("Answer is {}", &message);
+        
+        info!("Answer is:");
+        print!("{}", message);
+
         info!("Giphy query is {}", giphy_query);
     
         if send_cond == "available" && !is_available {
@@ -89,7 +91,16 @@ impl SpotifyInRussia<'_> {
                 warn!("Cannot send message: {:?}", err);
                 None
             }
-            _ => Some(())
+            Ok(response) => { 
+                match response.status() {
+                    code if !code.is_success() => {
+                        warn!("Not success status code! Reason: {}", code.canonical_reason().unwrap_or("no writable reason"));
+                        None
+                    },
+                    _ => Some(())
+                }
+                
+            }
         }
     }
 }
