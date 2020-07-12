@@ -6,6 +6,7 @@ extern crate clokwerk;
 extern crate chrono;
 #[macro_use]
 extern crate lazy_static;
+extern crate structopt;
 
 use log::{info, error, Level};
 use spotify_in_russia::{Config, SchedulerOpts, SpotifyInRussia, SpotifyEnvParams};
@@ -14,8 +15,17 @@ use std::time::Duration;
 use std::thread;
 use reqwest::{Client as ReqwsetClient, RedirectPolicy};
 use std::sync::atomic::{AtomicBool, Ordering};
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+#[structopt(name = "Spotify")]
+struct CliOpts {
+    #[structopt(short, long, default_value("./config.toml"))]
+    config: std::path::PathBuf,
+}
 
 lazy_static! {
+    static ref CLI_OPTS: CliOpts = CliOpts::from_args();
     static ref HTTP_CLIENT: ReqwsetClient = ReqwsetClient::builder()
         // Не фоловим редиректы
         .redirect(RedirectPolicy::none())
@@ -24,7 +34,7 @@ lazy_static! {
 
     static ref ENV_PARAMS: SpotifyEnvParams = SpotifyEnvParams::new();
 
-    static ref CONFIG: Config = Config::from_path("./config.toml");
+    static ref CONFIG: Config = Config::from_path(&CLI_OPTS.config);
 
     static ref SPOTIFY_IN_RUSSIA: SpotifyInRussia<'static> = SpotifyInRussia::new(&HTTP_CLIENT, &CONFIG, &ENV_PARAMS);
 
