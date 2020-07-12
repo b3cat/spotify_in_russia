@@ -1,4 +1,4 @@
-check_reg_exp = "(Россия|Russia|Российская Федерация|Russian Federation)"
+check_url = "https://www.spotify.com/ru-ru/"
 
 [scheduler]
 spy_check_interval = 300 # 5 minutes in secs

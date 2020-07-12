@@ -1,45 +1,32 @@
 extern crate reqwest;
-extern crate regex;
+extern crate log;
 
-use regex::Regex;
-
-const SPOTIFY_COUNTRY_URL: &str = "https://www.spotify.com/ru-ru/select-your-country/";
-
-#[derive(Debug)]
-pub enum CheckError {
-    ReqwestErr(reqwest::Error),
-    Error(String),
-}
-
-impl From<reqwest::Error> for CheckError {
-    fn from(error: reqwest::Error) -> Self {
-        CheckError::ReqwestErr(error)
-    }
-}
-
-impl From<String> for CheckError {
-    fn from(error: String) -> Self {
-        CheckError::Error(error)
-    }
-}
+use log::{info};
+use reqwest::{StatusCode, Error as ReqwestError};
 
 pub struct Checker<'a> {
     client: &'a reqwest::Client,
-    check_reg_exp: Regex,
+    check_url: &'a str,
 }
 
 impl Checker<'_> {
-    pub fn new<'a>(http_client: &'a reqwest::Client, reg_exp_str: &str) -> Checker<'a> {
+    pub fn new<'a>(http_client: &'a reqwest::Client, check_url: &'a str) -> Checker<'a> {
         Checker {
             client: http_client,
-            check_reg_exp: Regex::new(reg_exp_str).unwrap()
+            check_url,
         }
     }
 
-    pub fn check(&self) -> Result<bool, CheckError> {
-        let res = &self.client.get(SPOTIFY_COUNTRY_URL).send()?.text()?;
-        let m = self.check_reg_exp.find(&res);
+    pub fn check(&self) -> Result<bool, ReqwestError> {
+        let res = &self.client.get(self.check_url).send()?;
+        let status_code = res.status();
 
-        Ok(if m.is_some() { true } else { false })
+        match status_code {
+            StatusCode::OK => Ok(true),
+            _ => {
+                info!("Unavailable cause bad code was found: {}", status_code.as_u16());
+                Ok(false)
+            },
+        }
     }
 }
