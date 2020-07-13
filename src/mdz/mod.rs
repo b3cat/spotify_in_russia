@@ -1,4 +1,3 @@
-
 extern crate reqwest;
 extern crate serde;
 
@@ -23,40 +22,35 @@ pub struct Mdz<'a> {
 }
 
 impl Mdz<'_> {
-    pub fn new<'a>(client: &'a reqwest::Client) -> Mdz<'a> {
-        Mdz {
-            client,
+  pub fn new(client: &reqwest::Client) -> Mdz {
+    Mdz { client }
+  }
+
+  pub fn get_the_last_news(&self) -> Result<String, Box<dyn error::Error>> {
+    let method = "screens/news";
+    let endpoint = format!("{}{}", API_BASE, method);
+
+    let res = self.client
+      .get(&endpoint)
+      .send()?
+      .json::<MdzScreenNews>()?;
+
+    let mut result_title = String::from("");
+
+    for document_url in res.documents.keys() {
+      if document_url.contains("news/") {
+        if let Some(doc) = res.documents.get(document_url) {
+          match &doc.title {
+            Some(title) => {
+              result_title = title.to_string();
+              break;
+            },
+            None => ()
+          }
         }
+      }
     }
 
-    pub fn get_the_last_news(&self) -> Result<String, Box<dyn error::Error>> {
-        let method = "screens/news";
-        let endpoint = format!("{}{}", API_BASE, method);
-
-        let res = self.client
-            .get(&endpoint)
-            .send()?
-            .json::<MdzScreenNews>()?;
-
-        let mut result_title = String::from("");
-
-        for document_url in res.documents.keys() {
-            if document_url.contains("news/") {
-                match res.documents.get(document_url) {
-                    Some(doc) => {
-                        match &doc.title {
-                            Some(title) => {
-                                result_title = title.to_string();
-                                break;
-                            },
-                            None => ()
-                        }
-                    },
-                    None => ()
-                }
-            }
-        }
-        
-        Ok(result_title)
-    }
+    Ok(result_title)
+  }
 }
