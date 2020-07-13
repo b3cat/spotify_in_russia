@@ -1,20 +1,20 @@
 [package]
 name = "spotify_in_russia"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["b3cat"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = "2.33.0"
 serde = { version = "1.0.103", features = ["derive"] }
 toml = "0.5.5"
 reqwest = "0.9.22"
-regex = "0.1.70"
 log = "0.4"
 simple_logger = "1.3.0"
 rand = "0.7.2"
 clokwerk = "0.3.0"
 chrono = "0.4"
+lazy_static = "1.4.0"
+structopt = "0.3.15"
 

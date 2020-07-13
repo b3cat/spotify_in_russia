@@ -43,7 +43,7 @@ impl SpotifyInRussia<'_> {
         env_params: &'a SpotifyEnvParams,
     ) -> SpotifyInRussia<'a> {
         SpotifyInRussia {
-            checker: available::Checker::new(http_client, &config.check_reg_exp),
+            checker: available::Checker::new(http_client, &config.check_url),
             giphy: giphy::Giphy::new(http_client, &env_params.giphy_key),
             tgm: tgm::Tgm::new(http_client, &env_params.telegram_key, &env_params.chat_id),
             mdz: mdz::Mdz::new(http_client),
@@ -51,7 +51,7 @@ impl SpotifyInRussia<'_> {
         }
     }
 
-    pub fn check_and_send(&self, send_cond: &str) -> Option<()> {
+    pub fn check_and_send(&self, send_cond: &str) -> Option<bool> {
         let is_available = match self.checker.check() {
             Ok(res) => res,
             Err(err) => {
@@ -72,7 +72,7 @@ impl SpotifyInRussia<'_> {
     
         if send_cond == "available" && !is_available {
             info!("Available mode. But not available, i'll not send message");
-            return Some(())
+            return Some(is_available)
         }
     
         let url = match self.giphy.get_rand_image_url(giphy_query){
@@ -96,7 +96,7 @@ impl SpotifyInRussia<'_> {
                         warn!("Not success status code! Reason: {}", code.canonical_reason().unwrap_or("no writable reason"));
                         None
                     },
-                    _ => Some(())
+                    _ => Some(is_available)
                 }
                 
             }
