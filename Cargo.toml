@@ -1,6 +1,6 @@
 [package]
 name = "spotify_in_russia"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["b3cat"]
 edition = "2018"
 

@@ -22,6 +22,8 @@ use structopt::StructOpt;
 struct CliOpts {
     #[structopt(short, long, default_value("./config.toml"))]
     config: std::path::PathBuf,
+    #[structopt(short, long, default_value("INFO"), env = "LOG_LEVEL")]
+    log_level: Level,
 }
 
 lazy_static! {
@@ -42,7 +44,7 @@ lazy_static! {
 }
 
 fn main() {
-    simple_logger::init_with_level(Level::Info).unwrap();
+    simple_logger::init_with_level(CLI_OPTS.log_level).unwrap();
 
     let SchedulerOpts { spy_check_interval, daily_check_time, east_offfset } = &CONFIG.scheduler;
     let tz = chrono::FixedOffset::east(*east_offfset);

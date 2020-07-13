@@ -1115,7 +1115,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "spotify_in_russia"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "chrono 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "clokwerk 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
