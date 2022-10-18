@@ -16,14 +16,16 @@ pub struct SpotifyEnvParams {
     telegram_key: String,
     chat_id: String,
     giphy_key: String,
+    meduza_url: String,
 }
 
 impl SpotifyEnvParams {
     pub fn new() -> SpotifyEnvParams{
         SpotifyEnvParams {
-            telegram_key: env::var("TGM_TOKEN").unwrap_or(String::from("")),
-            chat_id: env::var("TGM_CHAT_ID").unwrap_or(String::from("")),
+            telegram_key: env::var("TGM_TOKEN").unwrap(),
+            chat_id: env::var("TGM_CHAT_ID").unwrap(),
             giphy_key: env::var("GIPHY_TOKEN").unwrap_or(String::from("")),
+            meduza_url: env::var("MEDUZA_URL").unwrap_or(String::from("https://meduza.global.ssl.fastly.net/api/w5/"))
         }
     }
 }
@@ -32,7 +34,7 @@ pub struct SpotifyInRussia<'a> {
     checker: available::Checker<'a>,
     config: &'a config::Config,
     giphy: giphy::Giphy<'a, 'a>,
-    mdz: mdz::Mdz<'a>,
+    mdz: mdz::Mdz<'a, 'a>,
     tgm: tgm::Tgm<'a, 'a, 'a>,
 }
 
@@ -46,7 +48,7 @@ impl SpotifyInRussia<'_> {
             checker: available::Checker::new(http_client, &config.check_url),
             giphy: giphy::Giphy::new(http_client, &env_params.giphy_key),
             tgm: tgm::Tgm::new(http_client, &env_params.telegram_key, &env_params.chat_id),
-            mdz: mdz::Mdz::new(http_client),
+            mdz: mdz::Mdz::new(http_client, &env_params.meduza_url),
             config: config,
         }
     }
@@ -61,8 +63,13 @@ impl SpotifyInRussia<'_> {
         };
     
         let answer = if is_available { &self.config.yes } else { &self.config.no };
-        let last_news = self.mdz.get_the_last_news().unwrap_or(String::from("В мире ничего не произошло"));
-
+        let last_news = match self.mdz.get_the_last_news() {
+            Ok(news) => news,
+            Err(e) => {
+                warn!("{}", e);
+                String::from("В мире ничего не произошло")
+            }
+        };
         let message = format!("{}.\n\n{}", last_news, answer.get_pretty_answer());
         let giphy_query = &answer.giphy_query;
         
