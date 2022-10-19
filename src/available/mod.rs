@@ -17,8 +17,8 @@ impl Checker<'_> {
         }
     }
 
-    pub fn check(&self) -> Result<bool, ReqwestError> {
-        let res = &self.client.get(self.check_url).send()?;
+    pub async fn check(&self) -> Result<bool, ReqwestError> {
+        let res = &self.client.get(self.check_url).send().await?;
         let status_code = res.status();
 
         match status_code {

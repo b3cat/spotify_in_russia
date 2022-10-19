@@ -50,15 +50,16 @@ impl Giphy<'_, '_> {
         }
     }
 
-    pub fn get_rand_image_url(&self, query: &str) -> Result<String, reqwest::Error> {
+    pub async fn get_rand_image_url(&self, query: &str) -> Result<String, reqwest::Error> {
         let method = "v1/gifs/random";
         let endpoint = format!("{}{}", API_BASE, method);
         let resp = self.client
             .get(&endpoint)
             .query(&[("api_key", self.api_key)])
             .query(&RandomImageRequest { tag: String::from(query), rating: String::from("g") })
-            .send()?
-            .json::<RandomImageResponse>()?;
+            .send()
+            .await?
+            .json::<RandomImageResponse>().await?;
         
         // хз, какая лучше, пусть будет обе)
         Ok(resp.data.images.original.url

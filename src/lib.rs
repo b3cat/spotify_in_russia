@@ -53,8 +53,8 @@ impl SpotifyInRussia<'_> {
         }
     }
 
-    pub fn check_and_send(&self, send_cond: &str) -> Option<bool> {
-        let is_available = match self.checker.check() {
+    pub async fn check_and_send(&self, send_cond: &str) -> Option<bool> {
+        let is_available = match self.checker.check().await {
             Ok(res) => res,
             Err(err) => {
                 warn!("Cannot get spotify status: {:?}, set false", err);
@@ -82,7 +82,7 @@ impl SpotifyInRussia<'_> {
             return Some(is_available)
         }
     
-        let url = match self.giphy.get_rand_image_url(giphy_query){
+        let url = match self.giphy.get_rand_image_url(giphy_query).await {
             Ok(res) => res,
             Err(err) => {
                 warn!("Get error when trying to search gif: {:?}, set false", err);
@@ -92,7 +92,7 @@ impl SpotifyInRussia<'_> {
     
         info!("Image url is {}", url);
     
-        match self.tgm.send_document(&url, &message) {
+        match self.tgm.send_document(&url, &message).await {
             Err(err) => {
                 warn!("Cannot send message: {:?}", err);
                 None

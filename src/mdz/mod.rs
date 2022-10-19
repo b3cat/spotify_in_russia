@@ -29,14 +29,15 @@ impl Mdz<'_, '_> {
         }
     }
 
-    pub fn get_the_last_news(&self) -> Result<String, Box<dyn error::Error>> {
+    pub async fn get_the_last_news(&self) -> Result<String, Box<dyn error::Error>> {
         let method = "screens/news";
         let endpoint = format!("{}{}", self.url, method);
 
         let res = self.client
             .get(&endpoint)
-            .send()?
-            .json::<MdzScreenNews>()?;
+            .send()
+            .await?
+            .json::<MdzScreenNews>().await?;
 
         let mut result_title = String::from("");
 

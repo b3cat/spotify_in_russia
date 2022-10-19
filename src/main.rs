@@ -10,10 +10,9 @@ extern crate structopt;
 
 use log::{info, error, Level};
 use spotify_in_russia::{Config, SchedulerOpts, SpotifyInRussia, SpotifyEnvParams};
-use clokwerk::{Scheduler, TimeUnits};
+use clokwerk::{TimeUnits, AsyncScheduler, Job};
 use std::time::Duration;
-use std::thread;
-use reqwest::{Client as ReqwsetClient, RedirectPolicy};
+use reqwest::{Client as ReqwsetClient, redirect};
 use std::sync::atomic::{AtomicBool, Ordering};
 use structopt::StructOpt;
 
@@ -30,7 +29,7 @@ lazy_static! {
     static ref CLI_OPTS: CliOpts = CliOpts::from_args();
     static ref HTTP_CLIENT: ReqwsetClient = ReqwsetClient::builder()
         // Не фоловим редиректы
-        .redirect(RedirectPolicy::none())
+        .redirect(redirect::Policy::none())
         .build()
         .unwrap();
 
@@ -43,15 +42,17 @@ lazy_static! {
     static ref FINISHED: AtomicBool = AtomicBool::new(false);
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     simple_logger::init_with_level(CLI_OPTS.log_level).unwrap();
 
     let SchedulerOpts { spy_check_interval, daily_check_time, east_offfset } = &CONFIG.scheduler;
     let tz = chrono::FixedOffset::east(*east_offfset);
-    let mut scheduler = Scheduler::with_tz(tz);
+    let mut scheduler = AsyncScheduler::with_tz(tz);
 
-    scheduler.every(spy_check_interval.seconds()).run(get_check_task("available"));
-    scheduler.every(1.day()).at(daily_check_time).run(get_check_task("always"));
+    info!("Starting work");
+    scheduler.every(spy_check_interval.seconds()).run(|| get_check_task("available"));
+    scheduler.every(1.day()).at(daily_check_time).run(|| get_check_task("always"));
 
     loop {
         let is_finished = FINISHED.load(Ordering::Relaxed);
@@ -59,24 +60,22 @@ fn main() {
             break
         }
 
-        scheduler.run_pending();
-        thread::sleep(Duration::from_millis(500));
+        scheduler.run_pending().await;
+        tokio::time::sleep(Duration::from_millis(500)).await;
     }
 }
 
-fn get_check_task(check_codition: &'static str) -> impl FnMut() + 'static + Send {
-    move || {
-        info!("Check send condition: {}", check_codition);
-        match SPOTIFY_IN_RUSSIA.check_and_send(check_codition) {
-            Some(is_available) => {
-                info!("Check completed successfully");
-                if is_available {
-                    // если вышел, то больше чекать не хотим
-                    FINISHED.store(true, Ordering::Relaxed);
-                }
-            },
-            _ => error!("Check failed"),
-        };
-    }
+async fn get_check_task(check_codition: &'static str) -> () {
+    info!("Check send condition: {}", check_codition);
+    match SPOTIFY_IN_RUSSIA.check_and_send(check_codition).await {
+        Some(is_available) => {
+            info!("Check completed successfully");
+            if is_available {
+                // если вышел, то больше чекать не хотим
+                FINISHED.store(true, Ordering::Relaxed);
+            }
+        },
+        _ => error!("Check failed"),
+    };
 }
 
