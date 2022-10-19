@@ -8,7 +8,8 @@ extern crate chrono;
 extern crate lazy_static;
 extern crate structopt;
 
-use log::{info, error, Level};
+use simple_logger::{SimpleLogger};
+use log::{info, error, LevelFilter};
 use spotify_in_russia::{Config, SchedulerOpts, SpotifyInRussia, SpotifyEnvParams};
 use clokwerk::{TimeUnits, AsyncScheduler, Job};
 use std::time::Duration;
@@ -22,7 +23,7 @@ struct CliOpts {
     #[structopt(short, long, default_value("./config.toml"))]
     config: std::path::PathBuf,
     #[structopt(short, long, default_value("INFO"), env = "LOG_LEVEL")]
-    log_level: Level,
+    log_level: LevelFilter,
 }
 
 lazy_static! {
@@ -44,7 +45,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    simple_logger::init_with_level(CLI_OPTS.log_level).unwrap();
+    SimpleLogger::new().with_level(CLI_OPTS.log_level).with_utc_timestamps().init().unwrap();
 
     let SchedulerOpts { spy_check_interval, daily_check_time, east_offfset } = &CONFIG.scheduler;
     let tz = chrono::FixedOffset::east(*east_offfset);
