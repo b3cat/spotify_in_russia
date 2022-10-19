@@ -63,7 +63,7 @@ impl SpotifyInRussia<'_> {
         };
     
         let answer = if is_available { &self.config.yes } else { &self.config.no };
-        let last_news = match self.mdz.get_the_last_news() {
+        let last_news = match self.mdz.get_the_last_news().await {
             Ok(news) => news,
             Err(e) => {
                 warn!("{}", e);
