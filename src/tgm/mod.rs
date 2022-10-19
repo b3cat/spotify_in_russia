@@ -26,7 +26,7 @@ impl Tgm<'_, '_, '_> {
         }
     }
 
-    pub fn send_document(&self, document: &str, caption: &str) -> reqwest::Result<reqwest::Response> {
+    pub async fn send_document(&self, document: &str, caption: &str) -> reqwest::Result<reqwest::Response> {
         let method = "sendDocument";
         let endpoint = format!("{}{}/{}", API_BASE, self.token, method);
         
@@ -34,5 +34,6 @@ impl Tgm<'_, '_, '_> {
             .query(&[("chat_id", self.chat_id)])
             .query(&SendDocumentParams { document, caption })
             .send()
+            .await
     }   
 }
